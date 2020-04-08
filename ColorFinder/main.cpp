@@ -45,18 +45,8 @@ int main(int argc, const char** argv)
 
             if (ErrCode > 0) {
                 double ColorFilterValues[3] = { 118,176,204 };
-
-                /* double* ColorFilterPtr[3];
-
-                 ColorFilterPtr[0]=  &ColorFilterValues[0];
-                 ColorFilterPtr[1] = &ColorFilterValues[1];
-                 ColorFilterPtr[2] = &ColorFilterValues[2];
-                 */
-
                 mode.ColorFilter(img, ColorFilterValues[0], 40, mask);
-
                 imshow("Result Screen", mask);
-
                 waitKey(0);
             }
             else

@@ -1,10 +1,7 @@
 #include "OperationModes.h"
+#include <fstream>
 
 using namespace cv;
-
-
-
-
 
 	int OperationModes::loadImage(std::string filename_str, cv::Mat &img_mat)
 	{
@@ -63,8 +60,8 @@ using namespace cv;
 
             //Get back the vector from Mat
             Vec3b hsvPixel(hsv.at<Vec3b>(0, 0));
-            Vec3b ycbPixel(ycb.at<Vec3b>(0, 0));
-            Vec3b labPixel(lab.at<Vec3b>(0, 0));
+            //Vec3b ycbPixel(ycb.at<Vec3b>(0, 0));
+            //Vec3b labPixel(lab.at<Vec3b>(0, 0));
 
             // Create an empty placeholder for displaying the values
             placeholder_mat = Mat::zeros(obj_image.rows, 400, CV_8UC3);
@@ -72,8 +69,7 @@ using namespace cv;
             //fill the placeholder with the values of color spaces
             putText(placeholder_mat, format("BGR [%d, %d, %d]", bgrPixel[0], bgrPixel[1], bgrPixel[2]), Point(20, 70), FONT_HERSHEY_COMPLEX, .9, Scalar(255, 255, 255), 1);
             putText(placeholder_mat, format("HSV [%d, %d, %d]", hsvPixel[0], hsvPixel[1], hsvPixel[2]), Point(20, 140), FONT_HERSHEY_COMPLEX, .9, Scalar(255, 255, 255), 1);
-            putText(placeholder_mat, format("YCrCb [%d, %d, %d]", ycbPixel[0], ycbPixel[1], ycbPixel[2]), Point(20, 210), FONT_HERSHEY_COMPLEX, .9, Scalar(255, 255, 255), 1);
-            putText(placeholder_mat, format("LAB [%d, %d, %d]", labPixel[0], labPixel[1], labPixel[2]), Point(20, 280), FONT_HERSHEY_COMPLEX, .9, Scalar(255, 255, 255), 1);
+            putText(placeholder_mat, format("Coordinate [X = %d, Y = %d]", x, y), Point(20, 210), FONT_HERSHEY_COMPLEX, .9, Scalar(255, 255, 255), 1);
 
 
             Size sz1 = obj_image.size();
@@ -119,10 +115,6 @@ using namespace cv;
         inRange(hsv_img0, lower_color, upper_color, mask);
 
        // threshold(hsv_img0, mask, 50, 100, THRESH_BINARY);
-        // Show the mask
-        //imshow("Mask ", mask);
-
-        //bitwise opperation to mask the original image
         Mat result;
 
         bitwise_and(input, input, output, mask);
@@ -156,6 +148,10 @@ using namespace cv;
     {
         //cv::Mat img_mat = img;
 
+        ofstream logfile;
+        
+        
+
         //Pass Matrix data as Pointer via userdata
         cv::Mat* pImage = (cv::Mat*) userdata;
         cv::Mat obj_image = *pImage;
@@ -166,7 +162,8 @@ using namespace cv;
 
         if (event == EVENT_RBUTTONDOWN)
         {
-            //imshow("Image", obj_image);
+            logfile.open("c:\\users\\esli\\pictures\\logfile.txt", ios::app); //Append to Logfile 
+            //imshow("Image", obj_image); 
             Vec3b bgrPixel(obj_image.at<Vec3b>(y, x));
 
             Mat3b hsv, ycb, lab;
@@ -187,11 +184,13 @@ using namespace cv;
             placeholder_mat = Mat::zeros(obj_image.rows, 400, CV_8UC3);
 
             //fill the placeholder with the values of color spaces
-            putText(placeholder_mat, format("BGR [%d, %d, %d]", bgrPixel[0], bgrPixel[1], bgrPixel[2]), Point(20, 70), FONT_HERSHEY_COMPLEX, .9, Scalar(255, 255, 255), 1);
-            putText(placeholder_mat, format("HSV [%d, %d, %d]", hsvPixel[0], hsvPixel[1], hsvPixel[2]), Point(20, 140), FONT_HERSHEY_COMPLEX, .9, Scalar(255, 255, 255), 1);
-            putText(placeholder_mat, format("YCrCb [%d, %d, %d]", ycbPixel[0], ycbPixel[1], ycbPixel[2]), Point(20, 210), FONT_HERSHEY_COMPLEX, .9, Scalar(255, 255, 255), 1);
-            putText(placeholder_mat, format("LAB [%d, %d, %d]", labPixel[0], labPixel[1], labPixel[2]), Point(20, 280), FONT_HERSHEY_COMPLEX, .9, Scalar(255, 255, 255), 1);
+            putText(placeholder_mat, format("BGR [%d, %d, %d]", bgrPixel[0], bgrPixel[1], bgrPixel[2]), Point(20, 70), FONT_ITALIC, .9, Scalar(255, 255, 255), 1);
+            putText(placeholder_mat, format("HSV [%d, %d, %d]", hsvPixel[0], hsvPixel[1], hsvPixel[2]), Point(20, 140), FONT_ITALIC, .9, Scalar(255, 255, 255), 1);
+            putText(placeholder_mat, format("CRD [X= %d, Y= %d]", x, y), Point(20, 210), FONT_HERSHEY_COMPLEX, .8, Scalar(255, 255, 255), 1);
 
+            logfile << x << "," << y << "," << int(bgrPixel[0]) << "," << int(bgrPixel[1]) << "," << int(bgrPixel[2]) << "\n";
+
+            //std::to_string();
 
             Size sz1 = obj_image.size();
             Size sz2 = placeholder_mat.size();
@@ -203,5 +202,9 @@ using namespace cv;
             Mat right(combinedResult, Rect(sz1.width, 0, sz2.width, sz2.height));
             placeholder_mat.copyTo(right);
             imshow("Pick a color to show the ColorVector Info", combinedResult);
+       
+            logfile.close();
         }
+
+       
     }
