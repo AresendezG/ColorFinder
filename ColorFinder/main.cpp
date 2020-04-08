@@ -44,32 +44,38 @@ int main(int argc, const char** argv)
             int ErrCode = mode.loadImage(filename, img);
 
             if (ErrCode > 0) {
-                int ColorFilterValues[3] = { 118,176,204 };
-                mode.ColorFilter(img, ColorFilterValues, 40, mask);
+                double ColorFilterValues[3] = { 118,176,204 };
+
+                /* double* ColorFilterPtr[3];
+
+                 ColorFilterPtr[0]=  &ColorFilterValues[0];
+                 ColorFilterPtr[1] = &ColorFilterValues[1];
+                 ColorFilterPtr[2] = &ColorFilterValues[2];
+                 */
+
+                mode.ColorFilter(img, ColorFilterValues[0], 40, mask);
+
+                imshow("Result Screen", mask);
+
                 waitKey(0);
             }
             else
                 cout << "Image cannot be loaded, Error Code: " << endl;
         }
-        else if (user_operation == "pickColor")
+        else if (user_operation == "pickColor_hover")
         {
             //namedWindow("Press ESC to Exit", WINDOW_AUTOSIZE);
             // Create a callback function for any event on the mouse
-          
 
             int ErrCode = mode.loadImage(filename, img);
-
             if (ErrCode > 0) {
-               //int ColorFilterValues[3] = { 0,255,0 };
-               // mode.ColorFilter(img, ColorFilterValues, 40, mask);
-               // waitKey(0);
-                mode.filename_str = filename;      
-                
+                //int ColorFilterValues[3] = { 0,255,0 };
+                // mode.ColorFilter(img, ColorFilterValues, 40, mask);
+                // waitKey(0);
+                mode.filename_str = filename;
                 //imshow("Press ESC to Exit", img);
                 //setMouseCallback("Press ESC to Exit", onMouse());
-
-                mode.PickColor();
- 
+                mode.PickColor(0);
                 while (1)
                 {
                     //setMouseCallback("Press ESC to Exit", onMouse);
@@ -78,16 +84,35 @@ int main(int argc, const char** argv)
                         break;
                     //Check next image in the folder
                 }
-            
-            
+
             }
             else
                 cout << "Image cannot be loaded, Error Code: " << endl;
 
 
+        }
+        else if (user_operation == "pickColor_click") {
 
+            int ErrCode = mode.loadImage(filename, img);
+            if (ErrCode > 0) {
+                mode.filename_str = filename;
+                mode.PickColor(1);
+                while (1)
+                {
+                    //setMouseCallback("Press ESC to Exit", onMouse);
+                    char k = waitKey(1) & 0xFF;
+                    if (k == 27)
+                        break;
+                    //Check next image in the folder
+                }
+
+            }
+            else
+                cout << "Image cannot be loaded, Error Code: " << endl;
 
         }
+        else
+            cout << "Command Error, Enter help to display list of commands";
 
     return 0;
 }

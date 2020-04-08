@@ -11,8 +11,9 @@ class OperationModes
 		int loadImage(std::string filename_str, cv::Mat &img_mat);
 		static void onMouse(int event, int x, int y, int flags, void* userdata);
 		void resizeImage(cv::Mat &Image, int Xsize, int Ysize);
-		void ColorFilter(cv::Mat& input, int colorFilterTarget[3], int Tolerance, cv::Mat& output);
-		void PickColor();
+		void ColorFilter(cv::Mat& input, double &colorFilterTarget, int Tolerance, cv::Mat& output);
+		void PickColor(int mode);
+		static void MouseClick(int event, int x, int y, int flags, void* userdata);
 
 	private: 
 		cv::String filename_opencvFormat;

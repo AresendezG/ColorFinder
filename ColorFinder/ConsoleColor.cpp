@@ -1,4 +1,4 @@
-#include "ColorFinder_Header.h"
+/*#include "ColorFinder_Header.h"
 
 using namespace cv;
 //using namespace std;
