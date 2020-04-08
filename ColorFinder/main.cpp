@@ -12,7 +12,7 @@ Mat img, placeholder;
 
 void onMouse(int event, int x, int y, int flags, void* userdata)
 {
-    cv::Mat img_mat = img;
+    cv::Mat img_mat = img; 
 
     //cv::imread(this->filename_str, 1);
 
