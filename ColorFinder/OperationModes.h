@@ -14,12 +14,14 @@ class OperationModes
 		void ColorFilter(cv::Mat& input, double &colorFilterTarget, int Tolerance, cv::Mat& output);
 		void PickColor(int mode);
 		static void MouseClick(int event, int x, int y, int flags, void* userdata);
+		void Find_ROI(cv::Mat &img_mat, int& coordinates);
 
 	private: 
 		cv::String filename_opencvFormat;
 		cv::Mat obj_img;
 		cv::String windowname;
-
+		void getHistogram(cv::Mat &hist_src);
+		void getMathData(cv::Mat &src);
 
 };
 
