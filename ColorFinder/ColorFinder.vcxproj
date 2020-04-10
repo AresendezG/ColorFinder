@@ -160,8 +160,13 @@
     <ClCompile Include="OperationModes.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CustomTypes.h" />
     <ClInclude Include="ColorFinder_Header.h" />
     <ClInclude Include="OperationModes.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ColorFinder.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

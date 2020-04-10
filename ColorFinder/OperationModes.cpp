@@ -1,7 +1,10 @@
 #include "OperationModes.h"
+#include "CustomTypes.h"
 #include <fstream>
 
 using namespace cv;
+
+//ClickHandler click;
 
 	int OperationModes::loadImage(std::string filename_str, cv::Mat &img_mat)
 	{
@@ -124,7 +127,7 @@ using namespace cv;
 
     }
 
-    void OperationModes::PickColor(int mode) {
+    void OperationModes::PickColor(int mode, ClickHandler &click_data) {
         /**/
 
         obj_img = imread(filename_str);
@@ -138,6 +141,11 @@ using namespace cv;
         case 1:
             cv::setMouseCallback(windowname, MouseClick, &obj_img);
             break;
+        
+        case 2: 
+            //ClickHandler click_handle_tmp;
+            cv::setMouseCallback(windowname, drawROI_rectangle, &click_data);
+            //this->click_handler = click;
         }
     
     }
@@ -209,7 +217,7 @@ using namespace cv;
        
     }
 
-    void OperationModes::Find_ROI(cv::Mat &img_mat, int &coordinates) {
+    void OperationModes::Find_ROI(cv::Mat &img_mat, cv::Rect &roi) {
 
         ofstream logfile;
 
@@ -217,12 +225,6 @@ using namespace cv;
 
         /* Set Region of Interest */
         cv::Vec3b bgrPixel, hsvPixel; //Pixel handler to log color
-        int* ROI_Coordinates[4];
-
-        ROI_Coordinates[0] = &coordinates; //x1
-        ROI_Coordinates[1] = &coordinates + 1; //y1
-        ROI_Coordinates[2] = &coordinates + 2; //x2
-        ROI_Coordinates[3] = &coordinates + 3; //y2
 
         /*
         
@@ -232,12 +234,13 @@ using namespace cv;
             x1,y2 ------ x2,y2 
         */
 
-
+        /*
         cv::Rect roi;
         roi.x = *ROI_Coordinates[0];
         roi.y = *ROI_Coordinates[1];
         roi.width = *ROI_Coordinates[2] - *ROI_Coordinates[0];
         roi.height = *ROI_Coordinates[3] - *ROI_Coordinates[1];
+        */
 
         /* Crop the original image to the defined ROI */
 
@@ -246,11 +249,12 @@ using namespace cv;
         cv::Mat cropHSV;
 
         cv::imshow("Cropped Image", crop);
-
+        cout << "Selected Area  x1:" << roi.x << "\t y1:" << roi.y << "\t x2:" << roi.x + roi.width << "\t y2:" << roi.y + roi.height << endl;
         OperationModes::getMathData(crop);
+        cout << endl;
 
         cv::cvtColor(crop, cropHSV, COLOR_BGR2HSV, 0);
-
+/*
         for (int i = 0; i < crop.rows; i++) {
             for (int j = 0; j < crop.cols; j++) {
 
@@ -259,12 +263,12 @@ using namespace cv;
                 logfile<<int(bgrPixel[0])<<","<<int(bgrPixel[1])<< "," <<int(bgrPixel[2])<<","<<int(hsvPixel[0])<<","<<int(hsvPixel[1])<<","<<int(hsvPixel[2])<<","<<i<<","<<j<<endl;
             }
         }
-
+*/
         logfile.close();
 
         cv::rectangle(img_mat, roi, (0, 255, 0), 1, 8, 0);
-        cv::imshow("Image Original", img_mat);
-        cv::waitKey(0);
+        cv::imshow(this->windowname, img_mat);
+//        cv::waitKey(0);
 
         //cv::imwrite("noises_cropped.png", crop);
 
@@ -363,4 +367,63 @@ using namespace cv;
         cout << "Blue: \t std " << std_dev_array[0] << "\t mean: " << data_mean[0] << "\t range: " << range_array[0] <<"\t mode:"<<mode_array[0] << endl;
         cout << "Green: \t std " << std_dev_array[1] << "\t mean: " << data_mean[1] << "\t range: " << range_array[1] << "\t mode:" << mode_array[1] << endl;
         cout << "Red: \t std " << std_dev_array[1] << "\t mean: " << data_mean[2] << "\t range: " << range_array[2] << "\t mode:" << mode_array[2] << endl;
+        
+        MaxIndex = 0;
+        minIndex = 0;
     }
+
+    void OperationModes::findROI_click(cv::Mat &img_mat){}
+
+    void OperationModes::drawROI_rectangle(int event, int x, int y, int flags, void* userdata){
+
+        ClickHandler* pHandler = (ClickHandler*) userdata;
+        ClickHandler handler = *pHandler;
+
+
+ 
+            if (event == EVENT_LBUTTONDOWN && handler.isDragging == false)
+            {
+                //keep track of initial point clicked
+                handler.startPoint= cv::Point(x, y);
+                //user has begun dragging the mouse
+                handler.isDragging = true;
+                //copyback to handler
+                *pHandler = handler;
+            }
+            /* user is dragging the mouse */
+            if (event == EVENT_MOUSEMOVE && handler.isDragging == true)
+            {
+                //keep track of current mouse point
+                handler.currentPoint = cv::Point(x, y);
+                //user has moved the mouse while clicking and dragging
+                handler.isMoving = true;
+                *pHandler = handler;
+            }
+            /* user has released left button */
+            if (event == EVENT_LBUTTONUP && handler.isDragging == true)
+            {
+                //set rectangle ROI to the rectangle that the user has selected
+                handler.rectArea = Rect(handler.startPoint, handler.currentPoint);
+
+                //reset boolean variables
+                handler.isDragging = false;
+                handler .isMoving = false;
+                handler.isReleased = true;
+                handler.rectangleSelected = true;
+                *pHandler = handler;
+            }
+
+            if (event == EVENT_RBUTTONDOWN) {
+                //user has clicked right mouse button
+                //Reset HSV Values
+               // handler.isDragging = true;
+
+            }
+
+
+    }
+
+    void updateClickData() {
+        //this->click_data = click;
+    }
+
