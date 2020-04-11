@@ -148,6 +148,7 @@ int main(int argc, const char** argv)
 
             if (ErrCode > 0) {
                 Mat filtered_img;
+                Mat mask;
                 mode.filename_str = filename;
                 mode.PickColor(2, click_data); // Set mouse callback and save everything on click data
                 FilterValues FilterData;
@@ -161,7 +162,7 @@ int main(int argc, const char** argv)
                     {
                         mode.Find_ROI(img, click_data.rectArea, FilterData);
                         click_data.rectangleSelected = false; //After drawing the ROI, wait for next
-                        mode.ColorFilter(img, FilterData, filtered_img);
+                        mode.ColorFilter(img, FilterData, filtered_img, mask);
                         imshow("Filtered Colors", filtered_img);
                         waitKey(0);
                         break;
@@ -195,44 +196,83 @@ int main(int argc, const char** argv)
         else if (user_operation == "imageHasColor") {
                 
         // User must pass Color filter as BBB,GGG,RRR max of 255 for each channel
-        std::string user_colorfilter;
+        std::string user_colorfilter, option2;
         FilterValues FilterData;
-        user_colorfilter = argv[3];
+        Mat output, mask;
 
-        int j = 0; int previousFound = 0;
-        
+        double TotalPixels; double NonZeroPixels;
 
-        /* Has color BGR and Tolerance level for each channel */
+        if (argc > 4) {
+            user_colorfilter = argv[3];
+            option2 = argv[4];
 
-        int filterValues_Array[3] = { 0,0,0 };
+            int j = 0; int previousFound = 0;
 
-        //StringContainer filter_str_array;
 
-        for (std::string::size_type i = 0; i < user_colorfilter.size(); ++i) {
-                    
-            if (user_colorfilter[i]==44) //Comma delimiter
-            {
-                filterValues_Array[j] = stoi(user_colorfilter.substr(previousFound, i));
+            /* Has color BGR and Tolerance level for each channel */
+
+            int filterValues_Array[6] = { 0,0,0,0,0,0 };
+
+            //StringContainer filter_str_array;
+
+            for (std::string::size_type i = 0; i < user_colorfilter.size(); ++i) {
+
+                if (user_colorfilter[i] == 44) //Comma delimiter
+                {
+                    filterValues_Array[j] = stoi(user_colorfilter.substr(previousFound, i));
                     if (filterValues_Array[j] > 255)
                         filterValues_Array[j] = 255;
                     if (filterValues_Array[j] < 0)
                         filterValues_Array[j] = 0;
-                
-                    previousFound = i+1;
-                j++;
+
+                    previousFound = i + 1;
+                    j++;
+                }
+                if (j == 5) {
+                    filterValues_Array[j] = stoi(user_colorfilter.substr(previousFound, i));
+                    break;
+                }
+
             }
-            if (j == 2) {
-               filterValues_Array[j] = stoi(user_colorfilter.substr(previousFound, i));
-               break;
-            }
 
+            FilterData.B = filterValues_Array[0];
+            FilterData.B_tolerance = filterValues_Array[3];
+            FilterData.G = filterValues_Array[1];
+            FilterData.G_tolerance = filterValues_Array[4];
+            FilterData.R = filterValues_Array[2];
+            FilterData.R_tolerance = filterValues_Array[5];
+
+            // imshow("Original Image", img);
+            mode.ColorFilter(img, FilterData, output, mask);
+            if (option2 != "noshow")
+                imshow("Filter Result", output);
+
+            TotalPixels = img.rows * img.cols;
+            NonZeroPixels = cv::countNonZero(mask);
+
+            cout << "Total pixels: \t" << TotalPixels << endl;
+            cout << "Filter Settings B:" << FilterData.B << "\t Green:" << FilterData.G << "\t Red:" << FilterData.R << endl;
+            cout << "Found Pixels: " << NonZeroPixels << endl;
+            waitKey(0);
         }
-        
-
-
+        else {
+            cout << "Wrong argument setting, example " << endl;
+            cout << "imageHasColors [path\img.ext] [B,G,R,T1,T2,T3] [showResult/noshow]" << endl;
         }
+}
 
+        else if (user_operation == "help") {
+           
+        cout <<"show" << endl;
+        cout <<"colorFilter"<<endl;
+        cout << "pickColor_hover" << endl;
+        cout << "pickColor_click" << endl;
+        cout << "findROI_click" << endl;
+        cout << "colorFilter_mouse" << endl;
+        cout << "find_ROI" << endl;
+        cout << "imageHasColor" << endl;
 
+}
         else
             cout << "Command Error, Enter help to display list of commands";
 

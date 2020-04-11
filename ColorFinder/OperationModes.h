@@ -15,7 +15,7 @@ class OperationModes
 		int loadImage(std::string filename_str, cv::Mat &img_mat);
 		static void onMouse(int event, int x, int y, int flags, void* userdata);
 		void resizeImage(cv::Mat &Image, int Xsize, int Ysize);
-		void ColorFilter(cv::Mat& input, FilterValues &FilterData, cv::Mat& output);
+		void ColorFilter(cv::Mat& input, FilterValues &FilterData, cv::Mat& output, cv::Mat &mask);
 		void PickColor(int mode, ClickHandler &click_data);
 		static void MouseClick(int event, int x, int y, int flags, void* userdata);
 		void Find_ROI(cv::Mat &img_mat, cv::Rect &roi, FilterValues &FilterData);

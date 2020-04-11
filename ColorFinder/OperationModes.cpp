@@ -92,7 +92,7 @@ using namespace cv;
 
 
 
-    void OperationModes::ColorFilter(cv::Mat& input, FilterValues &FilterData, cv::Mat& output) {
+    void OperationModes::ColorFilter(cv::Mat& input, FilterValues &FilterData, cv::Mat& output, cv::Mat& mask) {
 
         // Holds the threshold version of the image:
         //Mat hsv_img0;
@@ -105,8 +105,10 @@ using namespace cv;
         cv::Scalar lower_color = cv::Scalar(FilterData.B - FilterData.B_tolerance, FilterData.G - FilterData.G_tolerance, FilterData.R - FilterData.R_tolerance);
         cv::Scalar upper_color = cv::Scalar(FilterData.B + FilterData.B_tolerance, FilterData.G + FilterData.G_tolerance, FilterData.R + FilterData.R_tolerance);
 
-        Mat mask;
+        //Mat mask;
         inRange(input, lower_color, upper_color, mask);
+
+        //imshow("Mask Image", mask);
 
        // threshold(hsv_img0, mask, 50, 100, THRESH_BINARY);
        // Mat result;
