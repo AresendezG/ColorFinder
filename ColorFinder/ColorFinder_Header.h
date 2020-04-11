@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+#include <string>
 #include <iostream>
 //#include <opencv2/contrib.hpp>
 #include <opencv2/opencv.hpp>

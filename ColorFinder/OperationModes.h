@@ -15,22 +15,22 @@ class OperationModes
 		int loadImage(std::string filename_str, cv::Mat &img_mat);
 		static void onMouse(int event, int x, int y, int flags, void* userdata);
 		void resizeImage(cv::Mat &Image, int Xsize, int Ysize);
-		void ColorFilter(cv::Mat& input, double &colorFilterTarget, int Tolerance, cv::Mat& output);
+		void ColorFilter(cv::Mat& input, FilterValues &FilterData, cv::Mat& output);
 		void PickColor(int mode, ClickHandler &click_data);
 		static void MouseClick(int event, int x, int y, int flags, void* userdata);
-		void Find_ROI(cv::Mat &img_mat, cv::Rect &roi);
+		void Find_ROI(cv::Mat &img_mat, cv::Rect &roi, FilterValues &FilterData);
 		void findROI_click(cv::Mat &img_mat);
-		void selective_Filter(cv::);
-		//void updateClickData();
 
 	private: 
 		/*Attributes*/
 		cv::String filename_opencvFormat;
 		cv::Mat obj_img;
 		cv::String windowname;
+		//FilterValues bgr_filterValue;
+
 		/*Methods*/
 		void getHistogram(cv::Mat &hist_src);
-		void getMathData(cv::Mat &src);
+		void getMathData(cv::Mat &src, FilterValues &FilterData);
 		static void drawROI_rectangle(int event, int x, int y, int flags, void* userdata);
 
 };

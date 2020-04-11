@@ -92,38 +92,28 @@ using namespace cv;
 
 
 
-    void OperationModes::ColorFilter(cv::Mat& input, double &colorFilterTarget, int Tolerance, cv::Mat& output) {
+    void OperationModes::ColorFilter(cv::Mat& input, FilterValues &FilterData, cv::Mat& output) {
 
         // Holds the threshold version of the image:
-        
-        double *ColorFilter[3];
-            
-        ColorFilter[0] = &colorFilterTarget;
-        ColorFilter[1] = &colorFilterTarget + 1;
-        ColorFilter[2] = &colorFilterTarget + 2;
-        
-        Mat hsv_img0;
-
+        //Mat hsv_img0;
+        double tolerance;
 
         // Convert RGB to HSV
-
-        cvtColor(input, hsv_img0, COLOR_BGR2HSV);
-
-        imshow("HSV Image", hsv_img0);
-
-        cv::Scalar lower_color = cv::Scalar(*ColorFilter[0]-(Tolerance/2), *ColorFilter[1]-(Tolerance/2), *ColorFilter[2]-(Tolerance/2));
-        cv::Scalar upper_color = cv::Scalar(*ColorFilter[0] + (Tolerance / 2), *ColorFilter[1] + (Tolerance / 2), *ColorFilter[2] + (Tolerance / 2));
+        //cvtColor(input, hsv_img0, COLOR_BGR2HSV);
+        //imshow("HSV Image", hsv_img0);
+      
+        cv::Scalar lower_color = cv::Scalar(FilterData.B - FilterData.B_tolerance, FilterData.G - FilterData.G_tolerance, FilterData.R - FilterData.R_tolerance);
+        cv::Scalar upper_color = cv::Scalar(FilterData.B + FilterData.B_tolerance, FilterData.G + FilterData.G_tolerance, FilterData.R + FilterData.R_tolerance);
 
         Mat mask;
-        inRange(hsv_img0, lower_color, upper_color, mask);
+        inRange(input, lower_color, upper_color, mask);
 
        // threshold(hsv_img0, mask, 50, 100, THRESH_BINARY);
-        Mat result;
+       // Mat result;
 
         bitwise_and(input, input, output, mask);
 
        // imshow("Result", output);
-
 
     }
 
@@ -217,7 +207,7 @@ using namespace cv;
        
     }
 
-    void OperationModes::Find_ROI(cv::Mat &img_mat, cv::Rect &roi) {
+    void OperationModes::Find_ROI(cv::Mat &img_mat, cv::Rect &roi, FilterValues &FilterData) {
 
         ofstream logfile;
 
@@ -250,7 +240,7 @@ using namespace cv;
 
         cv::imshow("Cropped Image", crop);
         cout << "Selected Area  x1:" << roi.x << "\t y1:" << roi.y << "\t x2:" << roi.x + roi.width << "\t y2:" << roi.y + roi.height << endl;
-        OperationModes::getMathData(crop);
+        OperationModes::getMathData(crop, FilterData);
         cout << endl;
 
         cv::cvtColor(crop, cropHSV, COLOR_BGR2HSV, 0);
@@ -313,7 +303,7 @@ using namespace cv;
 
     }
 
-    void OperationModes::getMathData(cv::Mat& src) {
+    void OperationModes::getMathData(cv::Mat& src, FilterValues &bgr_filter) {
 
         vector<Mat> bgr_planes;
 
@@ -330,7 +320,6 @@ using namespace cv;
         double std_dev_array[3];
         double mean_array[3];
         double range_array[3];
-        double mode_array[3];
         double min, max;
         int minIndex, MaxIndex;
 
@@ -358,29 +347,36 @@ using namespace cv;
         }
 
         cv::minMaxIdx(b_hist, &min, &max, &minIndex, &MaxIndex, noArray());
-            mode_array[0] = MaxIndex;
+            //mode_array[0] = MaxIndex;
+            bgr_filter.B = MaxIndex;
         cv::minMaxIdx(g_hist, &min, &max, &minIndex, &MaxIndex, noArray());
-            mode_array[1] = MaxIndex;
+            //mode_array[1] = MaxIndex;
+            bgr_filter.G = MaxIndex;
         cv::minMaxIdx(r_hist, &min, &max, &minIndex, &MaxIndex, noArray());
-            mode_array[2] = MaxIndex;
+            //mode_array[2] = MaxIndex;
+              bgr_filter.R = MaxIndex;
 
-        cout << "Blue: \t std " << std_dev_array[0] << "\t mean: " << data_mean[0] << "\t range: " << range_array[0] <<"\t mode:"<<mode_array[0] << endl;
-        cout << "Green: \t std " << std_dev_array[1] << "\t mean: " << data_mean[1] << "\t range: " << range_array[1] << "\t mode:" << mode_array[1] << endl;
-        cout << "Red: \t std " << std_dev_array[1] << "\t mean: " << data_mean[2] << "\t range: " << range_array[2] << "\t mode:" << mode_array[2] << endl;
+        cout << "Blue: \t std " << std_dev_array[0] << "\t mean: " << data_mean[0] << "\t range: " << range_array[0] <<"\t mode:"<<bgr_filter.B << endl;
+        cout << "Green: \t std " << std_dev_array[1] << "\t mean: " << data_mean[1] << "\t range: " << range_array[1] << "\t mode:" << bgr_filter.G << endl;
+        cout << "Red: \t std " << std_dev_array[1] << "\t mean: " << data_mean[2] << "\t range: " << range_array[2] << "\t mode:" << bgr_filter.R << endl;
+
+        bgr_filter.B_tolerance = std_dev_array[0];
+        bgr_filter.G_tolerance = std_dev_array[1];
+        bgr_filter.R_tolerance = std_dev_array[2];
         
         MaxIndex = 0;
         minIndex = 0;
     }
 
-    void OperationModes::findROI_click(cv::Mat &img_mat){}
+    void OperationModes::findROI_click(cv::Mat &img_mat){
+    
+    }
 
     void OperationModes::drawROI_rectangle(int event, int x, int y, int flags, void* userdata){
 
         ClickHandler* pHandler = (ClickHandler*) userdata;
         ClickHandler handler = *pHandler;
 
-
- 
             if (event == EVENT_LBUTTONDOWN && handler.isDragging == false)
             {
                 //keep track of initial point clicked
@@ -422,8 +418,3 @@ using namespace cv;
 
 
     }
-
-    void updateClickData() {
-        //this->click_data = click;
-    }
-

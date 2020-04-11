@@ -1,5 +1,6 @@
 #pragma once
-#include "ColorFinder_Header.h"
+#include <string.h>
+//#include "ColorFinder_Header.h"
 using namespace cv;
 
 struct ClickHandler
@@ -19,4 +20,13 @@ struct FilterValues {
 	int B;
 	int G;
 	int R;
+	int B_tolerance;
+	int G_tolerance;
+	int R_tolerance;
+};
+
+struct StringContainer {
+	std::string B_str;
+	std::string G_str;
+	std::string R_str;
 };
