@@ -21,17 +21,13 @@ using namespace std;
 //Global Variables
 Mat img, placeholder;
 
-// Callback function for any event on he mouse
-
+//Main Function
 int main(int argc, const char** argv)
 {
-    //String filename;
-    // Read the input image
 
     cv::String filename;
     std::string user_operation;
     cv::Mat img;
-   // ClickHandler *click_ptr;
     ClickHandler click_data;
 
     click_data.isDragging = false;
@@ -43,8 +39,14 @@ int main(int argc, const char** argv)
         user_operation = argv[1];
         filename = String(argv[2]);
         
+        int ErrCode = -1;
 
-        int ErrCode = mode.loadImage(filename, img);
+        if (argc > 2) {
+            ErrCode = mode.loadImage(filename, img);
+        }
+        else {
+            ErrCode = -1;
+        }
 
         if (user_operation == "show") {
 
@@ -257,7 +259,7 @@ int main(int argc, const char** argv)
         }
         else {
             cout << "Wrong argument setting, example " << endl;
-            cout << "imageHasColors [path\img.ext] [B,G,R,T1,T2,T3] [showResult/noshow]" << endl;
+            cout << "imageHasColors [path\\img.ext] [B,G,R,T1,T2,T3] [showResult/noshow]" << endl;
         }
 }
 
