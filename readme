@@ -1,0 +1,20 @@
+# Color finder exe
+
+This console application has only one purpose, telling you if an input image has one or more pixels of a given color range.
+
+An example of how to use it is the following command:
+
+        colorfinder.exe imageHasColor c:\path\to\your\image.png 0,255,0,10,20,20 show
+
+In this setting, the application will let you know if the image has pixels of the given color setting (BGR) with 10,20 and 20 tolerance 
+for each color channel. 
+
+There are other modes of operation, such as selecting a region of interest, and get the color data on that region.
+
+You can use the following command:
+        colorfinder.exe colorFilter_mouse c:\path\to\your\image.png 
+Which let you select a region of interest using your mouse and will get the colors of that region, and filter the original image to display only those
+colors in the ROI 
+The software will calculate what is the most common color value in that region, along with the standar deviation 
+
+You can type colorfinder.exe help -h for a list of all of the available commands
