@@ -89,6 +89,24 @@ using namespace cv;
     }
 
 
+    void OperationModes::ColorFilterHSV(cv::Mat& input, FilterValues& FilterHSV, cv::Mat& output, cv::Mat& mask) {
+
+        double tolerance;
+
+        cv::Scalar lower_color = cv::Scalar(FilterHSV.B - FilterHSV.B_tolerance, FilterHSV.G - FilterHSV.G_tolerance, FilterHSV.R - FilterHSV.R_tolerance);
+        cv::Scalar upper_color = cv::Scalar(FilterHSV.B + FilterHSV.B_tolerance, FilterHSV.G + FilterHSV.G_tolerance, FilterHSV.R + FilterHSV.R_tolerance);
+        Mat hsv_img;
+
+        cvtColor(input, hsv_img, COLOR_BGR2HSV);
+        //imshow("HSV Image", hsv_img0);
+
+        inRange(hsv_img, lower_color, upper_color, mask);
+
+        bitwise_and(hsv_img, hsv_img, output, mask);
+
+        // imshow("Result", output);
+
+    }
 
 
 
@@ -99,8 +117,7 @@ using namespace cv;
         double tolerance;
 
         // Convert RGB to HSV
-        //cvtColor(input, hsv_img0, COLOR_BGR2HSV);
-        //imshow("HSV Image", hsv_img0);
+
       
         cv::Scalar lower_color = cv::Scalar(FilterData.B - FilterData.B_tolerance, FilterData.G - FilterData.G_tolerance, FilterData.R - FilterData.R_tolerance);
         cv::Scalar upper_color = cv::Scalar(FilterData.B + FilterData.B_tolerance, FilterData.G + FilterData.G_tolerance, FilterData.R + FilterData.R_tolerance);

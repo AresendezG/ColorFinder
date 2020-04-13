@@ -195,7 +195,7 @@ int main(int argc, const char** argv)
                 cout << "Image cannot be loaded, Error Code" << endl;
         }
 
-        else if (user_operation == "imageHasColor") {
+        else if (user_operation == "imageHasColor" || user_operation == "imageHasColorHSV") {
                 
         // User must pass Color filter as BBB,GGG,RRR max of 255 for each channel
         std::string user_colorfilter, option2;
@@ -245,7 +245,11 @@ int main(int argc, const char** argv)
             FilterData.R_tolerance = filterValues_Array[5];
 
             // imshow("Original Image", img);
-            mode.ColorFilter(img, FilterData, output, mask);
+            if ("imageHasColor")
+                mode.ColorFilter(img, FilterData, output, mask);
+            else
+                mode.ColorFilterHSV(img, FilterData, output, mask);
+
             if (option2 != "noshow")
                 imshow("Filter Result", output);
 

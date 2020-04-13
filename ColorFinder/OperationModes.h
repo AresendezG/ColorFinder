@@ -20,6 +20,7 @@ class OperationModes
 		static void MouseClick(int event, int x, int y, int flags, void* userdata);
 		void Find_ROI(cv::Mat &img_mat, cv::Rect &roi, FilterValues &FilterData);
 		void findROI_click(cv::Mat &img_mat);
+		void ColorFilterHSV(cv::Mat& input, FilterValues& FilterHSV, cv::Mat& output, cv::Mat& mask);
 
 	private: 
 		/*Attributes*/
