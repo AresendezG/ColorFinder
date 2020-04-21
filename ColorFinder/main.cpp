@@ -34,253 +34,237 @@ int main(int argc, const char** argv)
     click_data.isReleased = true;
     click_data.rectangleSelected = false;
 
-    OperationModes  mode;
         
         user_operation = argv[1];
         filename = String(argv[2]);
         
         int ErrCode = -1;
 
-        if (argc > 2) {
+        /* Will check if more than 2 args were passed*/
+        if (sizeof(argv) > 2) {
+
+            OperationModes  mode;
             ErrCode = mode.loadImage(filename, img);
+
+            if (ErrCode > 1) {
+
+                /* Operation Image can be loaded so pick the Sw Operation*/
+                if (user_operation == "show") {
+                    imshow("Image Display", img);
+                    cv::waitKey(0);
+                }
+
+                else if (user_operation == "FixedColorFilter") //Not Usable
+                {
+                    cv::Mat mask, filterImg;
+                    double ColorFilterValues[3] = { 118,176,204 };
+                    imshow("Image Display", img);
+                    // mode.ColorFilter(img, ColorFilterValues[0], 40, mask);
+                    imshow("Result Screen", mask);
+                    cv::waitKey(0);
+                }
+
+                else if (user_operation == "pickColor_hover")
+                {
+                    //namedWindow("Press ESC to Exit", WINDOW_AUTOSIZE);
+                    // Create a callback function for any event on the mouse
+
+                        //int ColorFilterValues[3] = { 0,255,0 };
+                        // mode.ColorFilter(img, ColorFilterValues, 40, mask);
+                        // waitKey(0);
+                    mode.filename_str = filename;
+                    //imshow("Press ESC to Exit", img);
+                    //setMouseCallback("Press ESC to Exit", onMouse());
+                    ClickHandler click;
+                    mode.PickColor(0, click);
+                    while (1)
+                    {
+                        //setMouseCallback("Press ESC to Exit", onMouse);
+                        char k = cv::waitKey(1) & 0xFF;
+                        if (k == 27)
+                            break;
+                        //Check next image in the folder
+                    }
+
+                }
+
+                else if (user_operation == "pickColor_click") {
+
+                    ClickHandler click;
+                    mode.filename_str = filename;
+                    mode.PickColor(1, click);
+                    while (1)
+                    {
+                        //setMouseCallback("Press ESC to Exit", onMouse);
+                        char k = cv::waitKey(1) & 0xFF;
+                        if (k == 27)
+                            break;
+                        //Check next image in the folder
+                    }
+
+                }
+
+                else if (user_operation == "findROI_click") {
+
+                    FilterValues FilterData;
+                    mode.filename_str = filename;
+                    mode.PickColor(2, click_data); // Set mouse callback and save everything on click data
+                    while (1)
+                    {
+                        //setMouseCallback("Press ESC to Exit", onMouse);
+                        char k = cv::waitKey(1) & 0xFF;
+                        if (k == 27)
+                            break;
+                        if (click_data.rectangleSelected)
+                        {
+                            mode.Find_ROI(img, click_data.rectArea, FilterData);
+                            click_data.rectangleSelected = false; //After drawing the ROI, wait for next
+                        }
+                        //Check next image in the folder
+                    }
+
+                }
+
+                else if (user_operation == "colorFilter_mouse") {
+
+                    Mat filtered_img;
+                    Mat mask;
+                    mode.filename_str = filename;
+                    mode.PickColor(2, click_data); // Set mouse callback and save everything on click data
+                    FilterValues FilterData;
+                    while (1)
+                    {
+                        char k = waitKey(1) & 0xFF;
+                        if (k == 27)
+                            break;
+
+                        if (click_data.rectangleSelected)
+                        {
+                            mode.Find_ROI(img, click_data.rectArea, FilterData);
+                            click_data.rectangleSelected = false; //After drawing the ROI, wait for next
+                            mode.ColorFilter(img, FilterData, filtered_img, mask);
+                            imshow("Filtered Colors", filtered_img);
+                            waitKey(0);
+                            break;
+                        }
+                        //Check next image in the folder
+                    }
+
+                }
+
+                else if (user_operation == "find_ROI") {
+
+                    FilterValues FilterData;
+                    cv::Rect roi;
+                    roi.x = 200;
+                    roi.y = 150;
+                    roi.width = 300;
+                    roi.height = 200;
+
+                    if (ErrCode > 0) {
+
+                        mode.Find_ROI(img, roi, FilterData);
+                    }
+                    else
+                        cout << "Image cannot be loaded, Error Code" << endl;
+                }
+
+                else if (user_operation == "imageHasColor" || user_operation == "imageHasColorHSV") {
+
+                    // User must pass Color filter as BBB,GGG,RRR max of 255 for each channel
+                    std::string user_colorfilter, option2;
+                    FilterValues FilterData;
+                    Mat output, mask;
+
+                    double TotalPixels; double NonZeroPixels;
+
+                    if (argc > 4) {
+                        user_colorfilter = argv[3];
+                        option2 = argv[4];
+
+                        int j = 0; int previousFound = 0;
+
+
+                        /* Has color BGR and Tolerance level for each channel */
+
+                        int filterValues_Array[6] = { 0,0,0,0,0,0 };
+
+                        //StringContainer filter_str_array;
+
+                        for (std::string::size_type i = 0; i < user_colorfilter.size(); ++i) {
+
+                            if (user_colorfilter[i] == 44) //Comma delimiter
+                            {
+                                filterValues_Array[j] = stoi(user_colorfilter.substr(previousFound, i));
+                                if (filterValues_Array[j] > 255)
+                                    filterValues_Array[j] = 255;
+                                if (filterValues_Array[j] < 0)
+                                    filterValues_Array[j] = 0;
+
+                                previousFound = i + 1;
+                                j++;
+                            }
+                            if (j == 5) {
+                                filterValues_Array[j] = stoi(user_colorfilter.substr(previousFound, i));
+                                break;
+                            }
+
+                        }
+
+                        FilterData.B = filterValues_Array[0];
+                        FilterData.B_tolerance = filterValues_Array[3];
+                        FilterData.G = filterValues_Array[1];
+                        FilterData.G_tolerance = filterValues_Array[4];
+                        FilterData.R = filterValues_Array[2];
+                        FilterData.R_tolerance = filterValues_Array[5];
+
+                        // imshow("Original Image", img);
+                        if ("imageHasColor")
+                            mode.ColorFilter(img, FilterData, output, mask);
+                        else
+                            mode.ColorFilterHSV(img, FilterData, output, mask);
+
+                        if (option2 != "noshow")
+                            imshow("Filter Result", output);
+
+                        TotalPixels = img.rows * img.cols;
+                        NonZeroPixels = cv::countNonZero(mask);
+
+                        cout << "Total pixels: \t" << TotalPixels << endl;
+                        cout << "Filter Settings B:" << FilterData.B << "\t Green:" << FilterData.G << "\t Red:" << FilterData.R << endl;
+                        cout << "Found Pixels: " << NonZeroPixels << endl;
+                        waitKey(0);
+                    }
+                    else {
+                        cout << "Wrong argument setting, example " << endl;
+                        cout << "imageHasColors [path\\img.ext] [B,G,R,T1,T2,T3] [showResult/noshow]" << endl;
+                    }
+                }
+
+            }
+            else {
+            cout << "Required Image cannot be loaded, check path" << endl;
+            cout << "Example: colorfinder.exe [operation] [c:/path/to/image.png]" << endl;
+            }
         }
         else {
+            if (user_operation == "help") {
+
+                std::cout << "show" << endl;
+                std::cout << "colorFilter" << endl;
+                std::cout << "pickColor_hover" << endl;
+                std::cout << "pickColor_click" << endl;
+                std::cout << "findROI_click" << endl;
+                std::cout << "colorFilter_mouse" << endl;
+                std::cout << "find_ROI" << endl;
+                std::cout << "imageHasColor" << endl;
+
+            }
+             else
+               std::cout << "Command Error, Enter help to display list of commands";
+
             ErrCode = -1;
         }
 
-        if (user_operation == "show") {
-
-            if (ErrCode > 0)
-                imshow("Image Display", img);
-            else
-                cout << "Image cannot be loaded, Error code:" << ErrCode << endl;
-            waitKey(0);
-        }
-        else if (user_operation == "colorFilter")
-        {
-            cv::Mat mask, filterImg;
-
-            if (ErrCode > 0) {
-                double ColorFilterValues[3] = { 118,176,204 };
-              //  mode.ColorFilter(img, ColorFilterValues[0], 40, mask);
-                imshow("Result Screen", mask);
-                waitKey(0);
-            }
-            else
-                cout << "Image cannot be loaded, Error Code: " << endl;
-        }
-        else if (user_operation == "pickColor_hover")
-        {
-            //namedWindow("Press ESC to Exit", WINDOW_AUTOSIZE);
-            // Create a callback function for any event on the mouse
-            if (ErrCode > 0) {
-                //int ColorFilterValues[3] = { 0,255,0 };
-                // mode.ColorFilter(img, ColorFilterValues, 40, mask);
-                // waitKey(0);
-                mode.filename_str = filename;
-                //imshow("Press ESC to Exit", img);
-                //setMouseCallback("Press ESC to Exit", onMouse());
-
-                ClickHandler click;
-                mode.PickColor(0, click);
-                while (1)
-                {
-                    //setMouseCallback("Press ESC to Exit", onMouse);
-                    char k = waitKey(1) & 0xFF;
-                    if (k == 27)
-                        break;
-                    //Check next image in the folder
-                }
-
-            }
-            else
-                cout << "Image cannot be loaded, Error Code: " << endl;
-
-
-        }
-        else if (user_operation == "pickColor_click") {
-
-            if (ErrCode > 0) {
-                ClickHandler click;
-                mode.filename_str = filename;
-                mode.PickColor(1, click);
-                while (1)
-                {
-                    //setMouseCallback("Press ESC to Exit", onMouse);
-                    char k = waitKey(1) & 0xFF;
-                    if (k == 27)
-                        break;
-                    //Check next image in the folder
-                }
-
-            }
-            else
-                cout << "Image cannot be loaded, Error Code: " << endl;
-
-        }
-
-
-        else if (user_operation == "findROI_click") {
-
-            if (ErrCode > 0) {
-                FilterValues FilterData;
-                mode.filename_str = filename;
-                mode.PickColor(2, click_data); // Set mouse callback and save everything on click data
-                while (1)
-                {
-                    //setMouseCallback("Press ESC to Exit", onMouse);
-                    char k = waitKey(1) & 0xFF;
-                    if (k == 27)
-                        break;
-                    if (click_data.rectangleSelected)
-                    {
-                        mode.Find_ROI(img, click_data.rectArea, FilterData);
-                        click_data.rectangleSelected = false; //After drawing the ROI, wait for next
-                    }
-                    //Check next image in the folder
-                }
-
-            }
-            else
-                cout << "Image cannot be loaded, Error Code: " << endl;
-
-        }
-
-        else if (user_operation == "colorFilter_mouse") {
-
-            if (ErrCode > 0) {
-                Mat filtered_img;
-                Mat mask;
-                mode.filename_str = filename;
-                mode.PickColor(2, click_data); // Set mouse callback and save everything on click data
-                FilterValues FilterData;
-                while (1)
-                {
-                    char k = waitKey(1) & 0xFF;
-                    if (k == 27)
-                        break;
-
-                    if (click_data.rectangleSelected)
-                    {
-                        mode.Find_ROI(img, click_data.rectArea, FilterData);
-                        click_data.rectangleSelected = false; //After drawing the ROI, wait for next
-                        mode.ColorFilter(img, FilterData, filtered_img, mask);
-                        imshow("Filtered Colors", filtered_img);
-                        waitKey(0);
-                        break;
-                    }
-                    //Check next image in the folder
-                }
-
-            }
-            else
-                cout << "Image cannot be loaded, Error Code: " << endl;
-        }
-
-
-        else if (user_operation == "find_ROI") {
-
-        FilterValues FilterData;
-            cv::Rect roi;
-                roi.x = 200;
-                roi.y = 150;
-                roi.width = 300;
-                roi.height = 200;
-
-            if (ErrCode > 0) {
-
-               mode.Find_ROI(img, roi,FilterData);
-            }
-            else
-                cout << "Image cannot be loaded, Error Code" << endl;
-        }
-
-        else if (user_operation == "imageHasColor" || user_operation == "imageHasColorHSV") {
-                
-        // User must pass Color filter as BBB,GGG,RRR max of 255 for each channel
-        std::string user_colorfilter, option2;
-        FilterValues FilterData;
-        Mat output, mask;
-
-        double TotalPixels; double NonZeroPixels;
-
-        if (argc > 4) {
-            user_colorfilter = argv[3];
-            option2 = argv[4];
-
-            int j = 0; int previousFound = 0;
-
-
-            /* Has color BGR and Tolerance level for each channel */
-
-            int filterValues_Array[6] = { 0,0,0,0,0,0 };
-
-            //StringContainer filter_str_array;
-
-            for (std::string::size_type i = 0; i < user_colorfilter.size(); ++i) {
-
-                if (user_colorfilter[i] == 44) //Comma delimiter
-                {
-                    filterValues_Array[j] = stoi(user_colorfilter.substr(previousFound, i));
-                    if (filterValues_Array[j] > 255)
-                        filterValues_Array[j] = 255;
-                    if (filterValues_Array[j] < 0)
-                        filterValues_Array[j] = 0;
-
-                    previousFound = i + 1;
-                    j++;
-                }
-                if (j == 5) {
-                    filterValues_Array[j] = stoi(user_colorfilter.substr(previousFound, i));
-                    break;
-                }
-
-            }
-
-            FilterData.B = filterValues_Array[0];
-            FilterData.B_tolerance = filterValues_Array[3];
-            FilterData.G = filterValues_Array[1];
-            FilterData.G_tolerance = filterValues_Array[4];
-            FilterData.R = filterValues_Array[2];
-            FilterData.R_tolerance = filterValues_Array[5];
-
-            // imshow("Original Image", img);
-            if ("imageHasColor")
-                mode.ColorFilter(img, FilterData, output, mask);
-            else
-                mode.ColorFilterHSV(img, FilterData, output, mask);
-
-            if (option2 != "noshow")
-                imshow("Filter Result", output);
-
-            TotalPixels = img.rows * img.cols;
-            NonZeroPixels = cv::countNonZero(mask);
-
-            cout << "Total pixels: \t" << TotalPixels << endl;
-            cout << "Filter Settings B:" << FilterData.B << "\t Green:" << FilterData.G << "\t Red:" << FilterData.R << endl;
-            cout << "Found Pixels: " << NonZeroPixels << endl;
-            waitKey(0);
-        }
-        else {
-            cout << "Wrong argument setting, example " << endl;
-            cout << "imageHasColors [path\\img.ext] [B,G,R,T1,T2,T3] [showResult/noshow]" << endl;
-        }
-}
-
-        else if (user_operation == "help") {
-           
-        cout <<"show" << endl;
-        cout <<"colorFilter"<<endl;
-        cout << "pickColor_hover" << endl;
-        cout << "pickColor_click" << endl;
-        cout << "findROI_click" << endl;
-        cout << "colorFilter_mouse" << endl;
-        cout << "find_ROI" << endl;
-        cout << "imageHasColor" << endl;
-
-}
-        else
-            cout << "Command Error, Enter help to display list of commands";
-
-    return 0;
+    return ErrCode;
 }
