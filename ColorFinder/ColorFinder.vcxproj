@@ -72,27 +72,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <ExecutablePath>C:\OpenCV\opencv\build\include;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>C:\OpenCV\opencv\build\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\OpenCV\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>C:\Users\wvm683\source\repos\opencv-4.1.1\opencv\build\include;C:\OpenCV\opencv\build\include;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Users\wvm683\source\repos\opencv-4.1.1\opencv\build\include;C:\OpenCV\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\wvm683\source\repos\opencv-4.1.1\opencv\build\x64\vc15\lib;C:\OpenCV\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <ExecutablePath>C:\OpenCV\opencv\build\include;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>C:\OpenCV\opencv\build\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\OpenCV\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>C:\Users\wvm683\source\repos\opencv-4.1.1\opencv\build\include;C:\OpenCV\opencv\build\include;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Users\wvm683\source\repos\opencv-4.1.1\opencv\build\include;C:\OpenCV\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\wvm683\source\repos\opencv-4.1.1\opencv\build\x64\vc15\lib;C:\OpenCV\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>C:\OpenCV\opencv\build\include;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>C:\OpenCV\opencv\build\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\OpenCV\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\wvm683\source\repos\opencv-4.1.1\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\wvm683\source\repos\opencv-4.1.1\opencv\build\x64\vc15\lib;C:\OpenCV\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <ExecutablePath>C:\OpenCV\opencv\build\include;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>C:\OpenCV\opencv\build\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\OpenCV\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\wvm683\source\repos\opencv-4.1.1\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\wvm683\source\repos\opencv-4.1.1\opencv\build\x64\vc15\lib;C:\OpenCV\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

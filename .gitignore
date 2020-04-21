@@ -29,6 +29,7 @@ bld/
 
 #Visual Studio config 
 ColorFinder/ColorFinder.vcxproj
+ColorFinder/ColorFinder.vcxproj.filters
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
