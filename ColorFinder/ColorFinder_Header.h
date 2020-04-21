@@ -9,6 +9,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/cvconfig.h>
+#include <opencv2/imgcodecs.hpp>
 
 
 // ## Required for Color finder mouse 

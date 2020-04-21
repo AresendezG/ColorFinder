@@ -33,20 +33,20 @@ int main(int argc, const char** argv)
     click_data.isDragging = false;
     click_data.isReleased = true;
     click_data.rectangleSelected = false;
-
+    int ErrCode = -1;
         
+   try {
         user_operation = argv[1];
-        filename = String(argv[2]);
         
-        int ErrCode = -1;
 
         /* Will check if more than 2 args were passed*/
-        if (sizeof(argv) > 2) {
+        if (argc > 2) {
 
+            filename = String(argv[2]);
             OperationModes  mode;
             ErrCode = mode.loadImage(filename, img);
 
-            if (ErrCode > 1) {
+            if (ErrCode > 0) {
 
                 /* Operation Image can be loaded so pick the Sw Operation*/
                 if (user_operation == "show") {
@@ -242,29 +242,54 @@ int main(int argc, const char** argv)
                 }
 
             }
+
+             else if (ErrCode < 0 && user_operation == "snapshot") {
+
+                cout << "Snapshot mode" << endl;
+                int cam = 0;
+                cam = std::stoi(argv[2], nullptr);
+
+                VideoCapture cap(cam); // Initialize camera
+                 // Get the frame
+                Mat save_img; cap >> save_img;
+                //this_thread::sleep_for(chrono::seconds(3));
+                cap >> save_img; //Take snapshot after 3 seconds
+                if (save_img.empty()) {
+                  std::cerr << "Something wrong with Webcam, confirm it works" << std::endl;
+                }
+                 // Save the frame into a file
+                 imwrite(argv[3], save_img); // Save picture
+                 cout << "Image Save Successfull" << endl;
+              }
+
             else {
-            cout << "Required Image cannot be loaded, check path" << endl;
-            cout << "Example: colorfinder.exe [operation] [c:/path/to/image.png]" << endl;
+                std::cout << "Required Image cannot be loaded, check path" << endl;
+                std::cout << "Example: colorfinder.exe [operation] [c:/path/to/image.png]" << endl;
             }
         }
         else {
             if (user_operation == "help") {
 
-                std::cout << "show" << endl;
-                std::cout << "colorFilter" << endl;
-                std::cout << "pickColor_hover" << endl;
-                std::cout << "pickColor_click" << endl;
+                std::cout << "show [c:/path/to/image.png] to display an Image" << endl;
+                std::cout << "colorFilter [c:/path/to/image.png] to display a color filter example" << endl;
+                std::cout << "pickColor_hover [c:/path/to/image.png] hovering the mouse will display the color value" << endl;
+                std::cout << "pickColor_click [c:/path/to/image.png] Click in a region of the image to display the color value" << endl;
                 std::cout << "findROI_click" << endl;
                 std::cout << "colorFilter_mouse" << endl;
                 std::cout << "find_ROI" << endl;
-                std::cout << "imageHasColor" << endl;
-
+                std::cout << "imageHasColor [c:/path/to/image.png] [B,G,R,TolB,TolG,TolR] [show/noshow] display an image and set up a color filter" << endl;
+                std::cout << "snapshot [Webcam Number 0...9] [c:/path/to/image.png] Take a snapshot using the webcam at 0...9" << endl;
             }
-             else
-               std::cout << "Command Error, Enter help to display list of commands";
+            else
+                std::cout << "Command Error, Enter help to display list of commands";
 
             ErrCode = -1;
         }
+   }
+
+    catch (char *e) {
+        ErrCode = -150;
+   }
 
     return ErrCode;
 }
