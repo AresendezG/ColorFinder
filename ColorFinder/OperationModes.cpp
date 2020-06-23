@@ -1,6 +1,9 @@
 #include "OperationModes.h"
 #include "CustomTypes.h"
 #include <fstream>
+#include <sstream>
+//#include <string.h>
+//#include <Windows.h>
 
 using namespace cv;
 
@@ -152,9 +155,8 @@ using namespace cv;
             break;
         
         case 2: 
-            //ClickHandler click_handle_tmp;
             cv::setMouseCallback(windowname, drawROI_rectangle, &click_data);
-            //this->click_handler = click;
+            break;
         }
     
     }
@@ -282,6 +284,36 @@ using namespace cv;
         //cv::imwrite("noises_cropped.png", crop);
 
     }
+
+    void OperationModes::addTimeStamp(cv::Mat& snapshot) {
+        
+        struct tm newtime;
+        time_t now = time(0);
+        localtime_s(&newtime, &now);
+        stringstream ss;
+        ss << newtime.tm_year + 1900;
+        string year = ss.str();
+        ss << newtime.tm_mon + 1;
+        string month = ss.str();
+        ss << newtime.tm_mday;
+        string mday = ss.str();
+        ss << newtime.tm_hour;
+        string hour = ss.str();
+        ss << newtime.tm_min;
+        string min = ss.str();
+
+        //Fix concatenation str 
+
+        string datestr = year + "/" + month + "/" + mday + " " + hour + ":" + min;
+
+
+       // dateTimeStamp = (newtime.tm_year).tostring();
+
+        cv::putText(snapshot, datestr, Point(30, 30),
+           FONT_HERSHEY_DUPLEX, 0.9, Scalar(200, 200, 250), 1);
+    }
+
+
 
     void OperationModes::getHistogram(cv::Mat& hist_src) {
 

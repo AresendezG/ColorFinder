@@ -50,6 +50,8 @@ int main(int argc, const char** argv)
 
                 /* Operation Image can be loaded so pick the Sw Operation*/
                 if (user_operation == "show") {
+                   //add timestamp example
+                    mode.addTimeStamp(img);
                     imshow("Image Display", img);
                     cv::waitKey(0);
                 }
@@ -260,6 +262,11 @@ int main(int argc, const char** argv)
                  // Save the frame into a file
                  imwrite(argv[3], save_img); // Save picture
                  cout << "Image Save Successfull" << endl;
+
+                // mode.addTimeStamp(save_img);
+                // imshow(save_img);
+
+
               }
 
             else {
