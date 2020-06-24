@@ -6,14 +6,16 @@ using namespace cv;
 using namespace std;
 
 /*
-    Author: EARG
+    Author: Esli Alejandro Resendez
     ARGE Software, a brand of ARGE Technologies, LLC
     License: 
         Open Source, feel free to copy or reuse this code as you desire. 
         Parts of this code were copied from various OpenCV's ORG own resource pages:
         https://answers.opencv.org/questions/
         https://docs.opencv.org/master/examples.html
-        This software has no warranty
+        
+    Disclaimer:    
+    This software has no warranty of any kind. 
 
 */
 
@@ -68,15 +70,8 @@ int main(int argc, const char** argv)
 
                 else if (user_operation == "pickColor_hover")
                 {
-                    //namedWindow("Press ESC to Exit", WINDOW_AUTOSIZE);
-                    // Create a callback function for any event on the mouse
 
-                        //int ColorFilterValues[3] = { 0,255,0 };
-                        // mode.ColorFilter(img, ColorFilterValues, 40, mask);
-                        // waitKey(0);
                     mode.filename_str = filename;
-                    //imshow("Press ESC to Exit", img);
-                    //setMouseCallback("Press ESC to Exit", onMouse());
                     ClickHandler click;
                     mode.PickColor(0, click);
                     while (1)
@@ -259,13 +254,11 @@ int main(int argc, const char** argv)
                 if (save_img.empty()) {
                   std::cerr << "Something wrong with Webcam, confirm it works" << std::endl;
                 }
+                // Add system timestamp to img
+                mode.addTimeStamp(save_img);
                  // Save the frame into a file
                  imwrite(argv[3], save_img); // Save picture
                  cout << "Image Save Successfull" << endl;
-
-                // mode.addTimeStamp(save_img);
-                // imshow(save_img);
-
 
               }
 

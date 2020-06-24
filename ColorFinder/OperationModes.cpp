@@ -291,26 +291,21 @@ using namespace cv;
         time_t now = time(0);
         localtime_s(&newtime, &now);
         stringstream ss;
-        ss << newtime.tm_year + 1900;
-        string year = ss.str();
-        ss << newtime.tm_mon + 1;
-        string month = ss.str();
-        ss << newtime.tm_mday;
-        string mday = ss.str();
-        ss << newtime.tm_hour;
-        string hour = ss.str();
-        ss << newtime.tm_min;
-        string min = ss.str();
+        ss << newtime.tm_year + 1900; //Locale tm_year displays num of years after 1900
+        ss << "/" << newtime.tm_mon + 1; // Month is always 1 less?
+        ss << "/" << newtime.tm_mday; // Day seems to be all right
+        ss << " "<< newtime.tm_hour;
+        ss << ":" << newtime.tm_min;
+        
+        string datestr = ss.str(); // Save stream into datestr variable of type string
 
-        //Fix concatenation str 
-
-        string datestr = year + "/" + month + "/" + mday + " " + hour + ":" + min;
-
-
-       // dateTimeStamp = (newtime.tm_year).tostring();
-
-        cv::putText(snapshot, datestr, Point(30, 30),
-           FONT_HERSHEY_DUPLEX, 0.9, Scalar(200, 200, 250), 1);
+        //Print text to img mat
+        cv::putText(snapshot, //Image mat holder
+                     datestr, //string to print
+                     Point(30, 30), //coordinates of placement
+                     FONT_HERSHEY_DUPLEX,  //Font type 
+                     0.9, // Font size
+                     Scalar(220, 50, 10), 1); //color in BGR format
     }
 
 
