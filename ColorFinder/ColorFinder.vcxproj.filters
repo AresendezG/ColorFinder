@@ -48,5 +48,8 @@
     <Image Include="..\Data\CamIcon.ico">
       <Filter>Archivos de recursos</Filter>
     </Image>
+    <Image Include="..\..\Camera-Manager\Data\ColorScheme.ico">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
   </ItemGroup>
 </Project>
