@@ -2,6 +2,9 @@
 #include "OperationModes.h"
 #include "CustomTypes.h"
 
+
+#define CFVERSION "2.0.0.1" //Create a version of Colorfinder
+
 using namespace cv;
 using namespace std;
 
@@ -17,11 +20,34 @@ using namespace std;
     Disclaimer:    
     This software has no warranty of any kind. 
 
+    Last update: 12 Mayo 2022
+
+    Last change summary:
+    * Add the option of snap with delay so user can define the initialization delay for the camera
+
 */
 
 
 //Global Variables
 Mat img, placeholder;
+
+/*
+    For Snapshot mode:
+    snapwdelay [Webcam Number 0...9] [c:/path/to/image.png] [delay(seconds)]
+
+    argv[1] -> User Operation command (snapshot, filter, etc)
+    argv[2] -> Camera Index
+    argv[3] -> Image Save Path
+    argv[4] -> Delay in seconds
+
+    for other modes:
+    argv[1] -> User operation command
+    argv[2] -> Image Location
+    arvg[3...n] -> Extra params
+
+
+*/
+
 
 //Main Function
 int main(int argc, const char** argv)
@@ -36,8 +62,13 @@ int main(int argc, const char** argv)
     click_data.isReleased = true;
     click_data.rectangleSelected = false;
     int ErrCode = -1;
+
+   
+
         
    try {
+
+        std::cout << "Color Finder - Version "<< CFVERSION << endl;
         user_operation = argv[1];
         
 
@@ -48,7 +79,7 @@ int main(int argc, const char** argv)
             OperationModes  mode;
             ErrCode = mode.loadImage(filename, img);
 
-            if (ErrCode > 0) {
+             if (ErrCode > 0) {
 
                 /* Operation Image can be loaded so pick the Sw Operation*/
                 if (user_operation == "show") {
@@ -131,7 +162,7 @@ int main(int argc, const char** argv)
                     FilterValues FilterData;
                     while (1)
                     {
-                        char k = waitKey(1) & 0xFF;
+                        char k = cv::waitKey(1) & 0xFF;
                         if (k == 27)
                             break;
 
@@ -141,7 +172,7 @@ int main(int argc, const char** argv)
                             click_data.rectangleSelected = false; //After drawing the ROI, wait for next
                             mode.ColorFilter(img, FilterData, filtered_img, mask);
                             imshow("Filtered Colors", filtered_img);
-                            waitKey(0);
+                            cv::waitKey(0);
                             break;
                         }
                         //Check next image in the folder
@@ -163,7 +194,7 @@ int main(int argc, const char** argv)
                         mode.Find_ROI(img, roi, FilterData);
                     }
                     else
-                        cout << "Image cannot be loaded, Error Code" << endl;
+                        std::cout << "Image cannot be loaded, Error Code" << endl;
                 }
 
                 else if (user_operation == "imageHasColor" || user_operation == "imageHasColorHSV") {
@@ -227,14 +258,14 @@ int main(int argc, const char** argv)
                         TotalPixels = img.rows * img.cols;
                         NonZeroPixels = cv::countNonZero(mask);
 
-                        cout << "Total pixels: \t" << TotalPixels << endl;
-                        cout << "Filter Settings B:" << FilterData.B << "\t Green:" << FilterData.G << "\t Red:" << FilterData.R << endl;
-                        cout << "Found Pixels: " << NonZeroPixels << endl;
-                        waitKey(0);
+                        std::cout << "Total pixels: \t" << TotalPixels << endl;
+                        std::cout << "Filter Settings B:" << FilterData.B << "\t Green:" << FilterData.G << "\t Red:" << FilterData.R << endl;
+                        std::cout << "Found Pixels: " << NonZeroPixels << endl;
+                        cv::waitKey(0);
                     }
                     else {
-                        cout << "Wrong argument setting, example " << endl;
-                        cout << "imageHasColors [path\\img.ext] [B,G,R,T1,T2,T3] [showResult/noshow]" << endl;
+                        std::cout << "Wrong argument setting, example " << endl;
+                        std::cout << "imageHasColors [path\\img.ext] [B,G,R,T1,T2,T3] [showResult/noshow]" << endl;
                     }
                 }
 
@@ -242,7 +273,7 @@ int main(int argc, const char** argv)
 
              else if (ErrCode < 0 && user_operation == "snapshot") {
 
-                cout << "Snapshot mode" << endl;
+                std::cout << "Snapshot mode" << endl;
                 int cam = 0;
                 cam = std::stoi(argv[2], nullptr);
 
@@ -252,13 +283,42 @@ int main(int argc, const char** argv)
                 //this_thread::sleep_for(chrono::seconds(3));
                 cap >> save_img; //Take snapshot after 3 seconds
                 if (save_img.empty()) {
-                  std::cerr << "Something wrong with Webcam, confirm it works" << std::endl;
+                  std::cerr << "ERROR: Something wrong with Camera, confirm it works" << std::endl;
                 }
                 // Add system timestamp to img
                 mode.addTimeStamp(save_img);
                  // Save the frame into a file
-                 imwrite(argv[3], save_img); // Save picture
-                 cout << "Image Save Successfull" << endl;
+                 cv::imwrite(argv[3], save_img); // Save picture
+                 std::cout << "Image Save Successfull" << endl;
+
+              }
+
+             else if (ErrCode < 0 && user_operation == "snapwdelay") {
+
+             std::cout << "Snapshot mode with Cam Init'd delay" << endl;
+             int cam = 0, userdelay=0;
+             cam = std::stoi(argv[2], nullptr);
+             if (argc > 3) // User passed a delay parameter 
+             {
+                 userdelay = std::stoi(argv[4], nullptr);
+             }
+             else {
+                 userdelay = 1;
+             }
+             VideoCapture cap(cam); // Initialize camera
+              // Get the frame
+             Mat save_img; cap >> save_img;
+             this_thread::sleep_for(chrono::seconds(userdelay));
+             
+             cap >> save_img; //Take snapshot after 3 seconds
+             if (save_img.empty()) {
+                 std::cerr << "ERROR: Something wrong with Camera, confirm it works" << std::endl;
+             }
+             // Add system timestamp to img
+             mode.addTimeStamp(save_img);
+             // Save the frame into a file
+             cv::imwrite(argv[3], save_img); // Save picture
+             std::cout << "Image Save Successfull" << endl;
 
               }
 
@@ -277,8 +337,9 @@ int main(int argc, const char** argv)
                 std::cout << "findROI_click" << endl;
                 std::cout << "colorFilter_mouse" << endl;
                 std::cout << "find_ROI" << endl;
-                std::cout << "imageHasColor [c:/path/to/image.png] [B,G,R,TolB,TolG,TolR] [show/noshow] display an image and set up a color filter" << endl;
-                std::cout << "snapshot [Webcam Number 0...9] [c:/path/to/image.png] Take a snapshot using the webcam at 0...9" << endl;
+                std::cout << "imageHasColor [c:/path/to/image.png] [B,G,R,TolB,TolG,TolR] [show/noshow] display an image and set up a Color Filter" << endl;
+                std::cout << "snapshot [Cam Index 0...9] [c:/path/to/save/image.png] Take a snapshot using the Cam at 0...9" << endl;
+                std::cout << "snapwdelay [Cam Index 0...9] [c:/path/to/save/image.png] [delay(seconds)] Take a snapshot using selected cam and wait N seconds" << endl;
             }
             else
                 std::cout << "Command Error, Enter help to display list of commands";
