@@ -10,7 +10,8 @@ using namespace std;
 
 /*
     Author: Esli Alejandro Resendez
-    ARGE Software, a brand of ARGE Technologies, LLC
+    ARGE Software, a brand of Rio Bravo Technologies, LLC
+    
     License: 
         Open Source, feel free to copy or reuse this code as you desire. 
         Parts of this code were copied from various OpenCV's ORG own resource pages:
@@ -20,11 +21,10 @@ using namespace std;
     Disclaimer:    
     This software has no warranty of any kind. 
 
-    Last update: 12 Mayo 2022
+    Last update: 29 Noviembre 2022
 
     Last change summary:
-    * Add the option of snap with delay so user can define the initialization delay for the camera
-
+    * Update the config to work with OpenCV 4.6
 */
 
 
@@ -62,15 +62,16 @@ int main(int argc, const char** argv)
     click_data.isReleased = true;
     click_data.rectangleSelected = false;
     int ErrCode = -1;
-
-   
-
         
    try {
 
-        std::cout << "Color Finder - Version "<< CFVERSION << endl;
-        user_operation = argv[1];
-        
+        cout << "Color Finder - Version "<< CFVERSION << endl;
+        if (argv[0] == NULL || argv[1] == NULL){
+            user_operation == "none";
+        }
+        else {
+            user_operation = argv[1];
+        }
 
         /* Will check if more than 2 args were passed*/
         if (argc > 2) {
@@ -342,7 +343,10 @@ int main(int argc, const char** argv)
                 std::cout << "snapwdelay [Cam Index 0...9] [c:/path/to/save/image.png] [delay(seconds)] Take a snapshot using selected cam and wait N seconds" << endl;
             }
             else
+            {
                 std::cout << "Command Error, Enter help to display list of commands";
+                system("pause");
+            }
 
             ErrCode = -1;
         }
